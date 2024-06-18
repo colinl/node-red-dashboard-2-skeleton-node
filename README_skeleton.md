@@ -22,10 +22,7 @@ npm install _package_name_
 
 * **Class** - A CSS Class that will be applied to the wodget to allow override of display element style.
 
-## Dynamic Properties
-
+## Outputs
 
 ## CSS overrides
-
-Display elements my be overriden in the normal way using a ui-template node.  In particular:
 

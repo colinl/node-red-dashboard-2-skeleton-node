@@ -4,7 +4,7 @@
 <template>
     <!-- Component must be wrapped in a block so props such as className and style can be passed in from parent -->
     <div className="_node_name_-wrapper" :class="class">
-
+        <p>A skeleton UI widget</p>
     </div>
 </template>
 
