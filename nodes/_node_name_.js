@@ -9,31 +9,34 @@ module.exports = function (RED) {
 
         const base = group.getBase()
 
-        // initialise data store on startup or deploy
-        base.stores.data.save(base, node, {})
-
         // server-side event handlers
         const evts = {
             onAction: true,
             onInput: function (msg, send, done) {
-                // pick up existing stored data
-                let storedData = base.stores.data.get(node.id)
-                //console.log(`onInput storedData: ${JSON.stringify(storedData)}\n\n`)
-
                 // does msg.ui_update exist and is an object?
                 if (typeof msg.ui_update === 'object' && !Array.isArray(msg.ui_update) && msg.ui_update !== null) {
-                    // yes it does
-                    storedData.ui_update ??= {}    // initialise if necessary
-                    // merge in data from this message
-                    storedData.ui_update = {...storedData.ui_update, ...msg.ui_update}
+                    // array of strings containing properties to allow ui_update for
+                    // No need to include class or className, they are handled automatically
+                    const propertiesToUpdate = []
+                    // yes it does, do any pre-processing required of the contents
+                    msg.ui_update = handleSpecialPropertyUpdate(msg.ui_update)
+                    // merge data into the properties in the state store
+                    let statestore = base.stores.state
+                    for (const [key, value] of Object.entries(msg.ui_update)) {
+                        if (propertiesToUpdate.includes(key)) {
+                            statestore.set(base, node, msg, key, value)
+                        }
+                    }
                 }
+                // msg.enabled is handled by the core code, updating the value in props when necessary
 
-                // store the latest value in our Node-RED datastore
-                base.stores.data.save(base, node, storedData)
-                // send msg with any properties to be updated to any connected nodes in Node-RED
-                send(msg)
+                // store the latest message for replay on screen refresh if this is required
+                base.stores.data.save(base, node, msg)
+                // call send here if you want message pass through to connected nodes in Node-RED
+                //send(msg)
             },
             onSocket: {
+                // add any required custom events here
                 /*
                 'my-custom-event': function (conn, id, msg) {
                     console.info('"my-custom-event" received:', conn.id, id, msg)
@@ -57,4 +60,9 @@ module.exports = function (RED) {
     }
 
     RED.nodes.registerType('_node_name_', _NodeName_Node)
+}
+
+function handleSpecialPropertyUpdate(ui_update) {
+    // given a msg.ui_update object this massages any properties that need special handling
+    return ui_update
 }

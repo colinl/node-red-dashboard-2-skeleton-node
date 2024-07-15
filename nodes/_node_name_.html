@@ -18,11 +18,11 @@
                 }
             },
             height: { value: 0 },
-            myclass: {value: ""},
+            className: {value: ""},
         },
         inputs: 1,
         outputs: 0,
-        icon: "font-awesome/fa-dashboard",  // "fa-dashboard",
+        icon: "font-awesome/fa-list",
         paletteLabel: "_node_name_",
         label: function() {
             return this.name || "_node_name_";
@@ -55,6 +55,10 @@
         <input type="hidden" id="node-input-width">
         <input type="hidden" id="node-input-height">
         <button class="editor-button" id="node-input-size"></button>
+    </div>
+    <div class="form-row">
+        <label for="node-input-className"><i class="fa fa-tag"></i> Class</label>
+        <input type="text" id="node-input-className">
     </div>
 </script>
 
